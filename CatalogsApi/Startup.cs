@@ -34,8 +34,12 @@ public class Startup
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
 
+
         services.AddResponseCaching();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+        //services.AddAuthorization();
+
+
         services.AddTransient<ActionFilter>();
         services.AddHostedService<FileLoggerService>();
         services.AddAutoMapper(typeof(Startup));
@@ -79,6 +83,8 @@ public class Startup
         app.UseHttpsRedirection();
 
         app.UseResponseCaching();
+
+        //app.UseAuthentication();
 
         app.UseAuthorization();
 

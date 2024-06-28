@@ -12,9 +12,15 @@ namespace CatalogsApi.Utilities
             CreateMap<AuthorCreationDto, Author>();
             CreateMap<Author, AuthorDto>();
 
+            CreateMap<Author, AuthorDtoWithBooks>()
+                .ForMember(a => a.Books, opt => opt.MapFrom(MapAuthorDtoBooks));
+
             CreateMap<BookCreationDto, Book>()
                 .ForMember(b => b.AuthorsBooks, opt => opt.MapFrom(MapAuthorsBooks));
             CreateMap<Book, BookDto>();
+
+            CreateMap<Book, BookDtoWithAuthors>()
+                .ForMember(b => b.Authors, opt => opt.MapFrom(MapBookDtoAuthors));
 
             CreateMap<CommentCreationDto, Comment>();
             CreateMap<Comment, CommentDto>();
@@ -31,5 +37,32 @@ namespace CatalogsApi.Utilities
 
             return authorsBooks;
         }
+
+        public List<AuthorDto> MapBookDtoAuthors(Book book, BookDto bookDto)
+        {
+            var authorsDto = new List<AuthorDto>();
+
+            if (book.AuthorsBooks is null) return authorsDto;
+
+            foreach (var author in book.AuthorsBooks.OrderBy(a => a.Order))
+                authorsDto.Add(new AuthorDto() { Id = author.AuthorId, Name = author.Author.Name });
+
+
+            return authorsDto;
+        }
+
+        public List<BookDto> MapAuthorDtoBooks(Author author, AuthorDto authorDto)
+        {
+            var booksDto = new List<BookDto>();
+
+            if (author.AuthorsBooks is null) return booksDto;
+
+            foreach (var book in author.AuthorsBooks.OrderBy(a => a.Order))
+                booksDto.Add(new BookDto() { Id = book.AuthorId, Title = book.Book.Title });
+
+
+            return booksDto;
+        }
+
     }
 }

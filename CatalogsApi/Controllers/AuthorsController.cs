@@ -29,15 +29,17 @@ namespace CatalogsApi.Controllers
         //    return Ok(Guid.NewGuid());
         //}
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<AuthorDto>> GetById(int id)
+        [HttpGet("{id:int}", Name = "GetByIdAuthor")]
+        public async Task<ActionResult<AuthorDtoWithBooks>> GetById(int id)
         {
             var author = await _context.Authors
+                .Include(a => a.AuthorsBooks)
+                .ThenInclude(ab => ab.Book)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (author is null) return NotFound();
 
-            return Ok(_mapper.Map<AuthorDto>(author));
+            return Ok(_mapper.Map<AuthorDtoWithBooks>(author));
         }
 
         [HttpGet]
@@ -56,7 +58,12 @@ namespace CatalogsApi.Controllers
 
             _context.Add(author);
             await _context.SaveChangesAsync();
-            return Ok();
+
+
+            //return Ok();
+
+            var authorDto = _mapper.Map<AuthorDto>(author);
+            return CreatedAtRoute("GetByIdAuthor", new { id = author.Id }, authorDto);
         }
 
         [HttpPut("{id:int}")]

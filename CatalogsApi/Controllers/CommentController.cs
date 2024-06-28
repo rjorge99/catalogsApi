@@ -31,6 +31,16 @@ namespace CatalogsApi.Controllers
             return Ok(_mapper.Map<List<CommentDto>>(comments));
         }
 
+        [HttpGet("{id:int}", Name = "GetByIdComment")]
+        public async Task<ActionResult<CommentDto>> GetById(int id)
+        {
+            var commentDb = await _context.Comments.FirstOrDefaultAsync(b => b.Id == id);
+
+            if (commentDb is null) return NotFound("Comment not found");
+
+            return Ok(_mapper.Map<List<CommentDto>>(commentDb));
+        }
+
         [HttpPost]
         public async Task<ActionResult> Post(int bookId, CommentCreationDto commentCreationDto)
         {
@@ -43,7 +53,9 @@ namespace CatalogsApi.Controllers
 
             _context.Add(comment);
             await _context.SaveChangesAsync();
-            return Ok();
+
+            var commentDto = _mapper.Map<CommentDto>(comment);
+            return CreatedAtRoute("GetByIdComment", new { id = comment.Id, bookId = bookId }, commentDto);
         }
     }
 }

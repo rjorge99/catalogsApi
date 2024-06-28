@@ -20,16 +20,18 @@ namespace CatalogsApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<BookDto>> GetById(int id)
+        [HttpGet("{id:int}", Name = "GetByIdBook")]
+        public async Task<ActionResult<BookDtoWithAuthors>> GetById(int id)
         {
             var book = await _context.Books
                 //.Include(b => b.Comments)
+                .Include(b => b.AuthorsBooks)
+                .ThenInclude(ab => ab.Author)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (book is null) return NotFound();
 
-            return Ok(_mapper.Map<BookDto>(book));
+            return Ok(_mapper.Map<BookDtoWithAuthors>(book));
         }
 
         [HttpGet]
@@ -55,9 +57,13 @@ namespace CatalogsApi.Controllers
             //var authorExists = await _context.Authors.AnyAsync(a => a.Id == book.AuthorId);
             //if (!authorExists) return BadRequest("Author not found");
 
-            _context.Add(_mapper.Map<Book>(bookCreationDto));
+            var book = _mapper.Map<Book>(bookCreationDto);
+            _context.Add(book);
             await _context.SaveChangesAsync();
-            return Ok();
+
+            var bookDto = _mapper.Map<BookDto>(book);
+            return CreatedAtRoute("GetByIdBook", new { id = book.Id }, bookDto);
+            //return Ok();
         }
         //[HttpPut("{id:int}")]
         //public async Task<ActionResult> Put(int id, Author author)
