@@ -24,7 +24,8 @@ public class Startup
             {
                 options.Filters.Add(typeof(ExceptionFilter));
             })
-            .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
+            .AddNewtonsoftJson();
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {

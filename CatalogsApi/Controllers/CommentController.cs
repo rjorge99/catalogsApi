@@ -38,7 +38,8 @@ namespace CatalogsApi.Controllers
 
             if (commentDb is null) return NotFound("Comment not found");
 
-            return Ok(_mapper.Map<List<CommentDto>>(commentDb));
+            var commentDto = _mapper.Map<CommentDto>(commentDb);
+            return Ok(commentDto);
         }
 
         [HttpPost]
@@ -56,6 +57,26 @@ namespace CatalogsApi.Controllers
 
             var commentDto = _mapper.Map<CommentDto>(comment);
             return CreatedAtRoute("GetByIdComment", new { id = comment.Id, bookId = bookId }, commentDto);
+        }
+
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, int bookId, CommentCreationDto commentCreationDto)
+        {
+            var bookExists = await _context.Books.AnyAsync(b => b.Id == bookId);
+            if (!bookExists) return NotFound("Book not found");
+
+            var commentExists = _context.Comments.Any(x => x.Id == id);
+            if (!commentExists) return NotFound();
+
+            var comment = _mapper.Map<Comment>(commentCreationDto);
+            comment.Id = id;
+            comment.BookId = bookId;
+
+            _context.Update(comment);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

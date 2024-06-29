@@ -67,16 +67,19 @@ namespace CatalogsApi.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, Author author)
+        public async Task<ActionResult> Put(int id, AuthorCreationDto authorCreationDto)
         {
-            if (author.Id != id) return BadRequest("Invalid Id");
+            var authorExists = await _context.Authors.AnyAsync(x => x.Id == id);
+            if (!authorExists) return NotFound();
 
-            var authorDb = await _context.Authors.FirstOrDefaultAsync(x => x.Id == id);
-            if (authorDb == null) return NotFound();
+            var author = _mapper.Map<Author>(authorCreationDto);
+            author.Id = id;
+
+
 
             _context.Update(author);
             await _context.SaveChangesAsync();
-            return Ok();
+            return NoContent();
         }
 
 

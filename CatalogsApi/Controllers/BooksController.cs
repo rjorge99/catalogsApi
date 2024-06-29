@@ -2,6 +2,7 @@
 using CatalogsApi.Context;
 using CatalogsApi.Dtos;
 using CatalogsApi.Entites;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,32 +66,52 @@ namespace CatalogsApi.Controllers
             return CreatedAtRoute("GetByIdBook", new { id = book.Id }, bookDto);
             //return Ok();
         }
-        //[HttpPut("{id:int}")]
-        //public async Task<ActionResult> Put(int id, Author author)
-        //{
-        //    if (author.Id != id) return BadRequest("Invalid Id");
 
-        //    var authorDb = await _context.Authors.FirstOrDefaultAsync(x => x.Id == id);
-        //    if (authorDb == null) return NotFound();
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, BookCreationDto bookCreationDto)
+        {
+            var bookDb = await _context.Books
+                .Include(b => b.AuthorsBooks)
+                .FirstOrDefaultAsync(b => b.Id == id);
 
-        //    _context.Update(author);
-        //    await _context.SaveChangesAsync();
-        //    return Ok();
-        //}
+            if (bookDb is null) return NotFound();
+
+            _mapper.Map(bookCreationDto, bookDb);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
 
 
-        //[HttpDelete("{id:int}")]
-        //public async Task<ActionResult> Delete(int id)
-        //{
-        //    var authorDb = await _context.Authors.FirstOrDefaultAsync(x => x.Id == id);
+        [HttpPatch("{id:int}")]
+        public async Task<ActionResult> Patch(int id, JsonPatchDocument<BookPatchDto> patchDocument)
+        {
+            if (patchDocument is null) return BadRequest();
 
-        //    if (authorDb == null) return NotFound();
+            var bookDb = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+            if (bookDb is null) return NotFound();
 
-        //    //_context.Remove(new Author() { Id = id });
-        //    _context.Remove(authorDb);
-        //    await _context.SaveChangesAsync();
-        //    return Ok();
-        //}
+            var bookPatch = _mapper.Map<BookPatchDto>(bookDb);
+            patchDocument.ApplyTo(bookPatch, ModelState);
+
+            if (!TryValidateModel(bookPatch)) return BadRequest(ModelState);
+
+            _mapper.Map(bookPatch, bookDb);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var bookExists = await _context.Books.AnyAsync(x => x.Id == id);
+
+            if (!bookExists) return NotFound();
+
+            _context.Remove(new Book() { Id = id });
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
 
     }
 }

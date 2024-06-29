@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CatalogsApi.Dtos
 {
-    public class BookCreationDto
+    public class BookPatchDto
     {
         [Required]
         [IsFirstCharacterUpperCase]
@@ -11,7 +11,5 @@ namespace CatalogsApi.Dtos
         public string Title { get; set; }
 
         public DateTime ReleaseDate { get; set; }
-
-        public ICollection<int> AuthorsIds { get; set; }
     }
 }

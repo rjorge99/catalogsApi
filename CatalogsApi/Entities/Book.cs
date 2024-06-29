@@ -13,6 +13,8 @@ namespace CatalogsApi.Entites
         [StringLength(250)]
         public string Title { get; set; }
 
+        public DateTime? ReleaseDate { get; set; }
+
         public ICollection<Comment> Comments { get; set; }
         public ICollection<AuthorBook> AuthorsBooks { get; set; }
     }

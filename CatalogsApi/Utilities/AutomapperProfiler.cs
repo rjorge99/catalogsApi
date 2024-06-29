@@ -18,6 +18,7 @@ namespace CatalogsApi.Utilities
             CreateMap<BookCreationDto, Book>()
                 .ForMember(b => b.AuthorsBooks, opt => opt.MapFrom(MapAuthorsBooks));
             CreateMap<Book, BookDto>();
+            CreateMap<Book, BookPatchDto>().ReverseMap();
 
             CreateMap<Book, BookDtoWithAuthors>()
                 .ForMember(b => b.Authors, opt => opt.MapFrom(MapBookDtoAuthors));
