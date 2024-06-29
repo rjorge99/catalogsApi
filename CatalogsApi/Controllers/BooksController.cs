@@ -90,12 +90,12 @@ namespace CatalogsApi.Controllers
             var bookDb = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
             if (bookDb is null) return NotFound();
 
-            var bookPatch = _mapper.Map<BookPatchDto>(bookDb);
-            patchDocument.ApplyTo(bookPatch, ModelState);
+            var bookPatchDto = _mapper.Map<BookPatchDto>(bookDb);
+            patchDocument.ApplyTo(bookPatchDto, ModelState);
 
-            if (!TryValidateModel(bookPatch)) return BadRequest(ModelState);
+            if (!TryValidateModel(bookPatchDto)) return BadRequest(ModelState);
 
-            _mapper.Map(bookPatch, bookDb);
+            _mapper.Map(bookPatchDto, bookDb);
             await _context.SaveChangesAsync();
             return NoContent();
         }
