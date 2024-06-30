@@ -42,7 +42,7 @@ public class Startup
 
 
         services.AddTransient<ActionFilter>();
-        services.AddHostedService<FileLoggerService>();
+        // services.AddHostedService<FileLoggerService>();
         services.AddAutoMapper(typeof(Startup));
     }
 
