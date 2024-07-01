@@ -73,13 +73,14 @@ public class Startup
         //});
 
         //app.UseMiddleware<LogHttpResponseMiddleware>();
-        app.UseLogHttpResponse();
+        // app.UseLogHttpResponse();
 
         if (env.IsDevelopment())
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
         }
+        
+        app.UseSwagger();
+        app.UseSwaggerUI();
 
         app.UseHttpsRedirection();
 
