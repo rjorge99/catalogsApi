@@ -1,7 +1,5 @@
 ﻿using CatalogsApi.Context;
 using CatalogsApi.Filters;
-using CatalogsApi.Middlewares;
-using CatalogsApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
